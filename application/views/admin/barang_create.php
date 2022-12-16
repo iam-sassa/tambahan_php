@@ -20,7 +20,9 @@
 				<label for="price">Product Price</label>
 				<input type="text" name="price" placeholder="product name" required title="required"/>
 				<label for="image">Product Image</label>
-				<input type="file" name="image" placeholder="product name" required title="required"/>
+				<input type="file" name="image" required title="required"/>
+				<small><?php if (isset($error)) {
+	                echo $error;} ?></small>
 
 
                 <label for="init_stock">Init Stock</label>

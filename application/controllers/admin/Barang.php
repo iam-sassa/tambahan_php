@@ -19,25 +19,44 @@ class Barang extends CI_Controller
 	{
 		
 		if ($this->input->method() === 'post') {
-			$dataBarang = [
-				'code' => $this->input->post('code'),
-				'name' => $this->input->post('name'),
-				'price' => $this->input->post('price'),
-				'init_stock' => $this->input->post('init_stock'),
-				'description' => $this->input->post('description'),
-				'status' => $this->input->post('status'),
-				'created_at' => $this->input->post('created_at')
+
+			$ori_filename = $_FILES['image']['name'];
+			$new_name = time()."".str_replace(" ", ".",$ori_filename);
+			$config = [
+				'upload_path' => './images/',
+				'allowed_types' => 'gif|jpg|png',
+				'file_name' => $new_name,
 			];
 
-			$saved = $this->Barangmodel->insert($dataBarang);
-
-			if ($saved) {
-				$this->session->set_flashdata('message', 'New Barang was created');
-				return redirect('admin/barang');
+			$this->load->library('upload', $config);
+			if ( !$this->upload->do_upload('userfile')){
+				$imageError = array('imageError' => $this->upload->display_errors());
+				$this->load->view('admin/barang_create.php', $imageError);
+			}
+			else {
+				$prod_filename = $this->upload->data('file_name');
+				$dataBarang = [
+					'code' => $this->input->post('code'),
+					'name' => $this->input->post('name'),
+					'price' => $this->input->post('price'),
+					'init_stock' => $this->input->post('init_stock'),
+					'image' => $prod_filename,
+					'description' => $this->input->post('description'),
+					'status' => $this->input->post('status'),
+					'created_at' => $this->input->post('created_at')
+				];
+	
+				$saved = $this->Barangmodel->insert($dataBarang);
+	
+				if ($saved) {
+					$this->session->set_flashdata('message', 'New Barang was created');
+					return redirect('admin/barang');
+				}
+				
+				$this->load->view('admin/barang_create.php', $dataBarang);
 			}
 		}
 
-		$this->load->view('admin/barang_create.php', $data);
 	}
 
 	public function edit($id = null)
